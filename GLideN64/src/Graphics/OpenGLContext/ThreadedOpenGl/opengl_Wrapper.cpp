@@ -6,6 +6,7 @@
 #include <libco.h>
 extern "C" cothread_t retro_thread;
 extern "C" void context_reset();
+extern "C" bool threaded_gl_safe_shutdown = false;
 extern "C" void call_cmd_loop()
 {
     opengl::FunctionWrapper::commandLoop();
@@ -48,6 +49,8 @@ namespace opengl {
 	void FunctionWrapper::commandLoop()
 	{
 		bool timeToShutdown = false;
+        threaded_gl_safe_shutdown = false;
+        
 		while (!timeToShutdown) {
 			std::shared_ptr<OpenGlCommand> command;
 
@@ -64,6 +67,7 @@ namespace opengl {
 		}
 
         // Return
+        threaded_gl_safe_shutdown = true;
         co_switch(retro_thread);
 	}
 
